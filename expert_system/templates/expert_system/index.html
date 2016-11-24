@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">
+    <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>
+    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'expert_system/css/expert_system.css' %}">
+</head>
+<body>
+
+
+<div class="container">
+
+    {#    <div class="clearfix">#}
+    <div class="form-horizontal" style="padding-top: 30px">
+        <div class="form-group">
+            <label for="item_select" class="control-label col-sm-2" style="color:#31708f">Chọn mặt hàng:</label>
+            <div class="col-sm-3">
+                <select class="form-control inputstl" id="item_select">
+                    <option disabled selected value> -- chọn 1 loại mặt hàng --</option>
+                    {% for item in store_item_list %}
+                        <option value="{{ item.id }}" data-item-name="{{ item.name }}">{{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+        </div>
+    </div>
+    {#    </div>#}
+
+    <!-- Modal -->
+    <div id="modal-select-value" class="modal fade" role="dialog" data-property-id=" "
+         data-image-url="{% static "expert_system/img" %}" data-property-info="{% url 'get_property_value' %}">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="modal-title"></h4>
+                </div>
+                <div id="modal-body">
+                    <div class="clearfix" style="margin: auto;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btn-modal-save-change">Lưu thay đổi</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Hủy bỏ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="property-form" data-image-url="{% static "expert_system/img" %}"
+         data-property-list={% url 'get_property_list' %}>
+        <h4 id="property-form-title" class="alert alert-info"></h4>
+        <form action="{% url 'query_expert' %}" id="query-form" method="post">
+            {% csrf_token %}
+            <div class="form-group" id="property-form-list" style="float: left">
+            </div>
+            <div style="clear:both;">
+                <button type="submit" class="btn btn-danger center-block" id="btn-submit-query">
+                    Tìm danh sách các khách hàng tiềm năng
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $("#property-form").hide();
+    });
+
+    $('#item_select').on('change', function () {
+        var item_id = this.value;
+        var property_form = $("#property-form");
+        var base_url = property_form.data("property-list");
+        var image_url = property_form.data("image-url");
+        base_url += "?id=" + item_id.toString();
+        {#        console.log(base_url);#}
+        var property_form_list = $("#property-form-list");
+        property_form_list.empty();
+        property_form.fadeOut("slow");
+        $.ajax({
+            url: base_url
+        }).done(function (data) {
+            {#            console.log(data.item_name);#}
+            $("#property-form-title").text("Chọn giá trị cho các thuộc tính của mặt hàng " + data.item_name);
+            for (var i = 0; i < data.property_list.length; i++) {
+                var property_data = data.property_list[i];
+                var property_element = document.createElement('div');
+                $(property_element)
+                        .addClass('col-sm-6 col-md-4 property-element')
+                        .attr('data-property-value-id', property_data.first_value.id)
+                        .attr('data-property-id', property_data.item_id)
+                        .appendTo(property_form_list);
+                var thumbnail_div = document.createElement('div');
+                $(thumbnail_div)
+                        .addClass("thumbnail")
+                        .appendTo($(property_element));
+                var property_header = document.createElement('h4');
+                $(property_header)
+                        .appendTo($(thumbnail_div));
+                var property_title = document.createElement('span');
+                $(property_title)
+                        .addClass('property-title')
+                        .text(data.property_list[i].name + ": ")
+                        .appendTo($(property_header));
+                var property_value_name = document.createElement('span');
+                $(property_value_name)
+                        .addClass('property-value')
+                        .text(property_data.first_value.name)
+                        .appendTo($(property_header));
+                var image_element = document.createElement('img');
+                $(image_element)
+                        .addClass('property-image')
+                        .attr('data-src', image_url)
+                        .attr('src', image_url + "/" + property_data.first_value.id + "_value.png")
+                        .appendTo($(thumbnail_div));
+                var button_elemet = document.createElement('button');
+                $(button_elemet)
+                        .addClass('btn btn-primary col-xs-12 button-modal')
+                        .attr('type', 'button')
+                        .text('Thay đổi ...')
+                        .appendTo($(thumbnail_div));
+                $(image_element).click(function () {
+                    var property_element = $(this).closest(".property-element");
+                    set_modal_value_list(property_element.data('property-id'),
+                            property_element.attr('data-property-value-id'));
+                });
+                $(button_elemet).click(function () {
+                    var property_element = $(this).closest(".property-element");
+                    set_modal_value_list(property_element.data('property-id'),
+                            property_element.attr('data-property-value-id'));
+                });
+            }
+            property_form.fadeIn();
+
+        });
+
+    });
+
+    function set_modal_value_list(property_id, current_value_id) {
+        var modal_select_element = $("#modal-select-value");
+        modal_select_element.attr('data-property-id', property_id);
+        modal_select_element.find("#modal-body").find(".clearfix").empty();
+        var get_property_info_url = modal_select_element.data('property-info');
+        var image_url = modal_select_element.data("image-url");
+        $.ajax({
+            url: get_property_info_url + "?id=" + property_id.toString()
+        }).done(function (data) {
+            var modal_title = modal_select_element.find('#modal-title');
+            modal_title.text("Chọn giá trị cho thuộc tính: " + data.property_name);
+            var modal_body_element = modal_select_element.find("#modal-body").find(".clearfix");
+            for (var i = 0; i < data.value_list.length; i++) {
+                var property_data = data.value_list[i];
+                var modal_picker_element = document.createElement('div');
+                $(modal_picker_element)
+                        .addClass('col-sm-4 col-xs-6 col-md-3 col-lg-3 modal-picker')
+                        .attr('data-property-value-id', property_data.id)
+                        .appendTo($(modal_body_element));
+                $(modal_picker_element)
+                        .hover(function () {
+                            $(this).find(".thumbnail").attr('class', "thumbnail thumbnail-hover");
+                        }, function () {
+                            $(this).find(".thumbnail").attr('class', "thumbnail thumbnail-out");
+                        })
+                        .click(function () {
+                            $("#modal-body").find("#property-value-selected").attr('id', '');
+                            $(this).find(".thumbnail").attr('id', 'property-value-selected');
+                        });
+                var thumbnail_elemernt = document.createElement('div');
+                $(thumbnail_elemernt)
+                        .addClass("thumbnail thumbnail-out");
+                if (property_data.id == current_value_id) {
+                    $(thumbnail_elemernt)
+                            .attr('id', "property-value-selected");
+                }
+                $(thumbnail_elemernt).appendTo($(modal_picker_element));
+                var property_value_element = document.createElement('div');
+                $(property_value_element)
+                        .text(property_data.value)
+                        .addClass('property-value')
+                        .appendTo($(thumbnail_elemernt));
+                var img_element = document.createElement(('img'));
+                $(img_element).attr('style', "height:150px")
+                        .attr('src', image_url + "/" + property_data.id + "_value.png")
+                        .appendTo($(thumbnail_elemernt));
+            }
+        });
+        {#            modal-picker#}
+        modal_select_element.modal();
+    }
+    $("#btn-modal-save-change").click(function () {
+        var modal_select_form = $("#modal-select-value");
+        var property_id = modal_select_form.attr('data-property-id');
+        var new_value_id = $(modal_select_form
+                .find("#property-value-selected"))
+                .parent().data('property-value-id');
+        var new_value_name = $(modal_select_form
+                .find("#property-value-selected"))
+                .find(".property-value")
+                .text();
+
+        var property_element = $("#property-form-list").find('div[data-property-id="' + property_id + '"]');
+        $(property_element).find("h4").find(".property-value").text(new_value_name);
+        $(property_element).find("img").attr('src', $($(property_element).find("img")).data('src') + "/" + +new_value_id + "_value.png");
+        $(property_element).attr('data-property-value-id', new_value_id);
+        modal_select_form.modal('toggle');
+
+    });
+
+    $("#query-form").submit(function () {
+        var form_element = $('#query-form');
+        var property_value_form = $("#property-form-list");
+        // DO STUFF...
+        var property_value_list = property_value_form.find(".property-element");
+        for (var i = 0; i < property_value_list.length; i++) {
+            var property_element = $(property_value_list[i]);
+            var property_id = property_element.attr('data-property-id');
+            var property_value_id = property_element.attr('data-property-value-id');
+            console.log(property_id);
+            console.log(property_value_id);
+            var input_property_id = $("<input>")
+                    .attr("type", "hidden")
+                    .attr("name", "property_" + i + "_id").val(property_id);
+            var input_property_value = $("<input>")
+                    .attr("type", "hidden")
+                    .attr("name", "property_" + i + "_value_id").val(property_value_id);
+            form_element.append($(input_property_id));
+            form_element.append($(input_property_value));
+        }
+        var input_property_number = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "property_numbers").val(property_value_list.length);
+        form_element.append($(input_property_number));
+        var item_element_id = $('#item_select').val();
+        var input_item_id = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "item_id").val(item_element_id);
+        form_element.append($(input_item_id));
+        return true;
+
+    });
+
+</script>
+
+
+</body>
