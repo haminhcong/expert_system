@@ -32,3 +32,22 @@ class PropertyValue(models.Model):
         return u'%s' % self.value
 
 # Create your models here.
+
+class Fact(models.Model):
+    type = models.CharField(max_length=3,)
+    mean = models.CharField(max_length=100,)
+    value = models.CharField(max_length=2,)
+    is_value = models.CharField(max_length=2,)
+    cf = models.FloatField()
+
+    def __unicode__(self):
+        return self.id
+
+
+class Rule(models.Model):
+    left = models.CharField(max_length=50,)
+    right = models.CharField(max_length=10,)
+    cf = models.FloatField()
+
+    def __unicode__(self):
+        return self.id

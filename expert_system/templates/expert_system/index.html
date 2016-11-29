@@ -1,16 +1,26 @@
-{% load static %}
-<!DOCTYPE html>
-<meta charset="utf-8">
-<head>
+{% extends "expert_system/base.html" %}
+{% block css %}
+    {% load static %}
     <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">
     <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>
     <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>
     <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
     <link rel="stylesheet" href="{% static 'expert_system/css/expert_system.css' %}">
-</head>
-<body>
+{% endblock %}
+{#<!DOCTYPE html>#}
+{# {% load static %}#}
+{#<meta charset="utf-8">#}
+{#<head>#}
+{#    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">#}
+{#    <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>#}
+{#    <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>#}
+{#    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>#}
+{#    <link rel="stylesheet" href="{% static 'expert_system/css/expert_system.css' %}">#}
+{#</head>#}
+{#<body>#}
 
-
+{% block main %}
+<div class="content-w3ls">
 <div class="container">
 
     {#    <div class="clearfix">#}
@@ -68,8 +78,10 @@
         </form>
 
     </div>
-
 </div>
+</div>
+{% endblock %}
+{% block javascript %}
 <script>
     $(document).ready(function () {
         $("#property-form").hide();
@@ -249,5 +261,4 @@
 
 </script>
 
-
-</body>
+{% endblock %}
