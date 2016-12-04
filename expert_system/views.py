@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http.response import HttpResponse
 import json
-from models import StoreItem, PropertyValue, ItemProperty
+from expert_system.user import classify,algorithm
+from models import StoreItem, PropertyValue, ItemProperty, Fact
 
 
 def index(request):
@@ -34,6 +35,12 @@ def get_property_value(request):
         value_info = {'id':value_data.id,'value':value_data.value}
         property_data['value_list'].append(value_info)
     return HttpResponse(json.dumps(property_data), content_type='application/json')
+
+def backward_charning(list_fact_input,list_rule):
+    list_fact = Fact.objects.all()
+    list_fact = classify.classify_fact(list_fact,list_rule)
+    results = algorithm.backward_chaining(list_fact, list_rule)
+    return results
 
 def query_expert(request):
     if(request.method=="POST"):
