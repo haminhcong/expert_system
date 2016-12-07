@@ -1,4 +1,7 @@
-
+        /*.*/
+        /*.container{*/
+            /*position: relative;*/
+        /*}*/
         .thumbnail {
             position: relative;
             padding: 0;
