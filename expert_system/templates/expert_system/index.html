@@ -71,12 +71,7 @@
 
 </div>
 <script>
-    $(document).ready(function () {
-        $("#property-form").hide();
-    });
-
-    $('#item_select').on('change', function () {
-        var item_id = this.value;
+    set_property__list = function (item_id) {
         var property_form = $("#property-form");
         var base_url = property_form.data("property-list");
         var image_url = property_form.data("image-url");
@@ -139,9 +134,14 @@
                 });
             }
             property_form.fadeIn();
-
         });
+    };
 
+
+
+    $('#item_select').on('change', function () {
+        var item_id = this.value;
+        set_property__list(item_id);
     });
 
     function set_modal_value_list(property_id, current_value_id) {
@@ -195,6 +195,7 @@
         {#            modal-picker#}
         modal_select_element.modal();
     }
+
     $("#btn-modal-save-change").click(function () {
         var modal_select_form = $("#modal-select-value");
         var property_id = modal_select_form.attr('data-property-id');
