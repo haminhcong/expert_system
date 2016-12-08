@@ -31,13 +31,14 @@ class PropertyValue(models.Model):
     def __unicode__(self):
         return u'%s' % self.value
 
+
 # Create your models here.
 
 class Fact(models.Model):
-    type = models.CharField(max_length=3,)
-    mean = models.CharField(max_length=100,)
-    value = models.CharField(max_length=2,)
-    is_value = models.CharField(max_length=2,)
+    type = models.CharField(max_length=3, )
+    mean = models.CharField(max_length=100, )
+    value = models.CharField(max_length=2, )
+    is_value = models.CharField(max_length=2, )
     cf = models.FloatField()
 
     def __unicode__(self):
@@ -45,9 +46,35 @@ class Fact(models.Model):
 
 
 class Rule(models.Model):
-    left = models.CharField(max_length=50,)
-    right = models.CharField(max_length=10,)
+    left = models.CharField(max_length=50, )
+    right = models.CharField(max_length=10, )
     cf = models.FloatField()
 
     def __unicode__(self):
         return self.id
+
+
+class RightFactModel(models.Model):
+    content = models.CharField(max_length=100)
+    type = models.CharField(max_length=3)
+
+    def __unicode__(self):
+        return self.content
+
+
+class RuleModel(models.Model):
+    right = models.OneToOneField(
+        RightFactModel,
+        on_delete=models.CASCADE,
+    )
+    cf = models.FloatField()
+
+
+class LeftFactModel(models.Model):
+    rule_model = models.ForeignKey(RuleModel, on_delete=models.CASCADE)
+    content = models.CharField(max_length=100, )
+    type = models.CharField(max_length=3, )
+
+    def __unicode__(self):
+        return self.content
+

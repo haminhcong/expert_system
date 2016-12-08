@@ -2,6 +2,7 @@
         /*.container{*/
             /*position: relative;*/
         /*}*/
+
         .thumbnail {
             position: relative;
             padding: 0;
@@ -99,4 +100,7 @@
         }
         #btn-submit-query{
                 margin: auto;
+        }
+        .content-w3ls {
+            width: 1200px;
         }
