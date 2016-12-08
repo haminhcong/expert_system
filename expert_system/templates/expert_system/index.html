@@ -1,89 +1,73 @@
 {% extends "expert_system/base.html" %}
-{% block css %}
-    {% load static %}
-    <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>
-    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
-{% endblock %}
-{#<!DOCTYPE html>#}
-{# {% load static %}#}
-{#<meta charset="utf-8">#}
-{#<head>#}
-{#    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">#}
-{#    <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>#}
-{#    <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>#}
-{#    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>#}
-{#    <link rel="stylesheet" href="{% static 'expert_system/css/expert_system.css' %}">#}
-{#</head>#}
-{#<body>#}
+{% load static %}
 
 {% block main %}
-    <div class="content-w3ls">
-        <div class="container">
+    {#    <div class="content-w3ls">#}
+    <div class="container">
 
-            {#    <div class="clearfix">#}
-            <div class="form-horizontal" style="padding-top: 30px">
-                <div class="form-group">
-                    <label for="item_select" class="control-label col-sm-2" style="color:#31708f">Chọn mặt hàng:</label>
-                    <div class="col-sm-3">
-                        <select class="form-control inputstl" id="item_select">
-                            <option disabled selected value> -- chọn 1 loại mặt hàng --</option>
-                            {% for item in store_item_list %}
-                                <option value="{{ item.id }}" data-item-name="{{ item.name }}">{{ item.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <br>
+        {#    <div class="clearfix">#}
+        <div class="form-horizontal" style="padding-top: 30px">
+            <div class="form-group">
+                <label for="item_select" class="control-label col-sm-2" style="color:#31708f">Chọn mặt hàng:</label>
+                <div class="col-sm-3">
+                    <select class="form-control inputstl" id="item_select">
+                        <option disabled selected value> -- chọn 1 loại mặt hàng --</option>
+                        {% for item in store_item_list %}
+                            <option value="{{ item.id }}" data-item-name="{{ item.name }}">{{ item.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </div>
-            {#    </div>#}
-
-            <!-- Modal -->
-            <div id="modal-select-value" class="modal fade" role="dialog" data-property-id=" "
-                 data-image-url="{% static "expert_system/img" %}" data-property-info="{% url 'get_property_value' %}">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 id="modal-title"></h4>
-                        </div>
-                        <div id="modal-body">
-                            <div class="clearfix" style="margin: auto;">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="btn-modal-save-change">Lưu thay đổi
-                            </button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Hủy bỏ</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="property-form" data-image-url="{% static "expert_system/img" %}"
-                 data-property-list={% url 'get_property_list' %}>
-                <h4 id="property-form-title" class="alert alert-info"></h4>
-                <form action="{% url 'query_expert' %}" id="query-form" method="post">
-                    {% csrf_token %}
-                    <div class="form-group col-md-12" id="property-form-list" style="float: left">
-                    </div>
-                    <div style="clear:both;">
-                        <button type="submit" class="btn btn-danger center-block" id="btn-submit-query">
-                            Tìm danh sách các khách hàng tiềm năng
-                        </button>
-                    </div>
-                </form>
-
+                <br>
             </div>
         </div>
+        {#    </div>#}
+
+        <!-- Modal -->
+        <div id="modal-select-value" class="modal fade" role="dialog" data-property-id=" "
+             data-image-url="{% static "expert_system/img" %}" data-property-info="{% url 'get_property_value' %}">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 id="modal-title"></h4>
+                    </div>
+                    <div id="modal-body">
+                        <div class="clearfix" style="margin: auto;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-modal-save-change">Lưu thay đổi
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy bỏ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="property-form" data-image-url="{% static "expert_system/img" %}"
+             data-property-list={% url 'get_property_list' %}>
+            <h4 id="property-form-title" class="alert alert-info"></h4>
+            <form action="{% url 'query_expert' %}" id="query-form" method="post">
+                {% csrf_token %}
+                <div class="form-group col-md-12" id="property-form-list" style="float: left">
+                </div>
+                <div style="clear:both;">
+                    <button type="submit" class="btn btn-danger center-block" id="btn-submit-query">
+                        Tìm danh sách các khách hàng tiềm năng
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
+    {#    </div>#}
 {% endblock %}
 {% block javascript %}
     <script>
         var property_form = $("#property-form");
-        property_form.hide()
+        property_form.hide();
         set_property__list = function (item_id) {
             var property_form = $("#property-form");
             var base_url = property_form.data("property-list");

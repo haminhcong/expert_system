@@ -115,37 +115,73 @@ class ValueList:
 def edit_rule(request, rule_id):
     if request.method == "GET":
         rule = RuleModel.objects.filter(id=rule_id).first()
-        left_fact_list = rule.leftfactmodel_set.all()
+        new_left_fact_list = rule.leftfactmodel_set.all()
         right_fact = rule.right
         cf = rule.cf
         context = {}
-        for x in range(0, len(left_fact_list)):
-            context['left_fact_' + str(x + 1)] = left_fact_list[x].content
-            context['left_fact_' + str(x + 1) + '_type'] = int(left_fact_list[x].type)
+        for x in range(0, len(new_left_fact_list)):
+            context['left_fact_' + str(x + 1)] = new_left_fact_list[x].content
+            context['left_fact_' + str(x + 1) + '_type'] = int(new_left_fact_list[x].type)
             # context['left_fact_' + str(x + 1) + '_type'] = 2
 
-        for x in range(len(left_fact_list), 5):
+        for x in range(len(new_left_fact_list), 5):
             context['left_fact_' + str(x + 1)] = ''
             context['left_fact_' + str(x + 1) + '_type'] = 1
         right_fact.type = int(right_fact.type)
         context['right_fact'] = right_fact
         context['cf'] = cf
         context['rule_id'] = rule.id
-        context['value_list'] = [ValueList(1,'Start fact'),ValueList(2,'Middle Fact'), ValueList(3,'End Fact')]
+        context['value_list'] = [ValueList(1, 'Start fact'), ValueList(2, 'Middle Fact'), ValueList(3, 'End Fact')]
         return render(request, 'expert_system/edit_rule.html', context)
 
     if request.method == "POST":
+        rule_id = request.POST['rule_id']
+        current_rule = RuleModel.objects.filter(id=rule_id).first()
+        old_left_fact_list = current_rule.leftfactmodel_set.all()
+        for old_fact  in old_left_fact_list:
+            old_fact.delete()
+        new_left_fact_list = []
+        for x in range(1, 5):
+            left_fact = request.POST['left-fact-' + str(x)]
+            left_fact_type = request.POST['left-fact-' + str(x) + '-type']
+            if len(left_fact) > 0:
+                new_left_fact_list.append(LeftFactModel(content=left_fact, type=left_fact_type))
+        new_right_fact_content = request.POST['right-fact']
+        right_fact_type = request.POST['right-fact-type']
+        current_right_fact =  current_rule.right
+        rule_cf = request.POST['rule-cf']
+        current_right_fact.content = new_right_fact_content
+        current_right_fact.type =right_fact_type
+        current_rule.cf = rule_cf
+        current_right_fact.save()
+        current_rule.save()
+        for new_left_fact in new_left_fact_list:
+            new_left_fact.rule_model = current_rule
+            new_left_fact.save()
         return redirect(to='rule_list')
 
 
-def delete_rule(request, rule_id):
+def delete_rule_confirmation(request, rule_id):
     if request.method == "GET":
         rule = RuleModel.objects.filter(id=rule_id).first()
         left_fact_list = rule.leftfactmodel_set.all()
-        right_fact = rule.right
-        context = {}
+        left_side = ''
+        if len(left_fact_list) > 0:
+            left_side = left_fact_list[0].content + '(' + left_fact_list[0].type + ')'
+            for i in range(1, len(left_fact_list)):
+                left_side = left_side + ' and ' + left_fact_list[i].content + '(' + left_fact_list[i].type + ')'
+        right_side = rule.right.content + '(' + str(rule.right.type) + ')'
+        cf = rule.cf
+
+        rule_mean = left_side + ' => ' + right_side + ' : CF=' + str(cf)
+        context = {'rule_id': rule_id, 'rule_mean': rule_mean}
         return render(request, 'expert_system/delete_rule.html', context)
 
-    if request.method == "POST":
-        return redirect(to='rule_list')
 
+def delete_rule(request):
+    if request.method == "POST":
+        rule_id = request.POST['rule_id']
+        deleted_rule = RuleModel.objects.filter(id=rule_id).first()
+        deleted_rule.right.delete()
+        deleted_rule.delete()
+        return redirect(to='rule_list')

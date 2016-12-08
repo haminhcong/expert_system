@@ -26,15 +26,71 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     <!-- css files -->
     <!-- /css files -->
     <link href="{% static 'expert_system/css/style.css' %}" rel='stylesheet' type='text/css' media="all"/>
-    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">
+    <link href="{% static 'expert_system/css/bootstrap.css' %}" rel="stylesheet">
     <link href="{% static 'expert_system/css/expert_system.css' %}" rel='stylesheet' type='text/css' media="all"/>
+    <link href="{% static 'expert_system/css/simple-sidebar.css' %}" rel="stylesheet">
+
     {% block css %}
     {% endblock %}
+
+
 </head>
 <body>
-<h1 class="header-w3ls">Marketing Expert System</h1>
-{% block main %}{% endblock %}
-{#<p class="copyright">© 2016 Marketing Expert System. All Rights Reserved | Design by Le Huynh Duc</p>#}
+<div class="clearfix">
+    <div class="col-md-10">
+        <h1 class="header-w3ls">Marketing Expert System</h1>
+
+    </div>
+    <div class="col-md-2">
+        <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Hide/Show Menu</a>
+    </div>
+
+</div>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="{% url 'index' %}">
+                    Expert System
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'index' %}">Home</a>
+            </li>
+            <li>
+                <a href="{% url 'rule_list' %}">Rule Management</a>
+            </li>
+            <li>
+                <a href="{% url 'add_rule' %}">Add New Rule</a>
+            </li>
+
+        </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        {% block main %}{% endblock %}
+    </div>
+    <!-- /#page-content-wrapper -->
+</div>
+<p class="copyright">© 2016 Marketing Expert System. All Rights Reserved | Design by BKCloud</p>
+<script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>
+<script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
+
+{#    <!-- Bootstrap Core JavaScript -->#}
+{#    <script src="{% static 'expert_system/js/jquery.js' %}"></script>#}
+{##}
+{#    <!-- Menu Toggle Script -->#}
+<script>
+    $("#wrapper").toggleClass("toggled");
+    $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+</script>
 {% block javascript %}{% endblock %}
 </body>
 </html>

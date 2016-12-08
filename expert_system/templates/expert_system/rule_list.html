@@ -28,63 +28,59 @@
 {% endblock %}
 
 {% block main %}
-    <div class="content-w3ls">
-        <div class="container">
-            <div class="col-md-offset-1 table-rule">
+    <div class="container">
+        <div class="col-md-offset-1 table-rule">
 
-                <div class="panel panel-default panel-table">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col col-xs-6">
-                                <h3 class="panel-title">Rule List</h3>
-                            </div>
-                            <div class="col col-xs-6 text-right">
-                                <a href="{% url 'add_rule' %}">
-                                    <button type="button" class="btn btn-sm btn-primary btn-create">Create New</button>
-                                </a>
-                            </div>
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col col-xs-6">
+                            <h3 class="panel-title">Rule List</h3>
+                        </div>
+                        <div class="col col-xs-6 text-right">
+                            <a href="{% url 'add_rule' %}">
+                                <button type="button" class="btn btn-sm btn-primary btn-create">Create New</button>
+                            </a>
                         </div>
                     </div>
-                    <div class="panel-body">
-                        <table class="table table-striped table-bordered table-list">
-                            <thead>
-                            <tr>
-                                <th>Rule ID</th>
-                                <th>Left Side</th>
-                                <th>Rigt Side</th>
-                                <th>CF</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for rule in rule_list %}
-                                <tr>
-                                    <td>{{ rule.rule_id }}</td>
-                                    <td>{{ rule.left_side }}</td>
-                                    <td>{{ rule.right_side }}</td>
-                                    <td>{{ rule.cf }}</td>
-                                    <td>
-                                        <a href="{% url 'edit_rule' rule_id=rule.rule_id %}" class="btn btn-primary"
-                                           role="button">
-                                            EDIT
-                                        </a>
-                                        <a href="{% url 'delete_rule' rule_id=rule.rule_id %}" class="btn btn-danger"
-                                           role="button">
-                                            DELETE
-                                        </a>
-
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-
-                    </div>
                 </div>
+                <div class="panel-body">
+                    <table class="table table-striped table-bordered table-list">
+                        <thead>
+                        <tr>
+                            <th>Rule ID</th>
+                            <th>Left Side</th>
+                            <th>Rigt Side</th>
+                            <th>CF</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for rule in rule_list %}
+                            <tr>
+                                <td class="col-md-1">{{ rule.rule_id }}</td>
+                                <td class="col-md-5">{{ rule.left_side }}</td>
+                                <td class="col-md-3">{{ rule.right_side }}</td>
+                                <td class="col-md-1">{{ rule.cf }}</td>
+                                <td class="col-md-2">
+                                    <a href="{% url 'edit_rule' rule_id=rule.rule_id %}" class="btn btn-primary"
+                                       role="button">
+                                        EDIT
+                                    </a>
+                                    <a href="{% url 'delete_rule_confirmation' rule_id=rule.rule_id %}"
+                                       class="btn btn-danger"
+                                       role="button">
+                                        DEL
+                                    </a>
 
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
             </div>
-
-
         </div>
     </div>
 {% endblock %}

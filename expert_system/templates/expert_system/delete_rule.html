@@ -10,27 +10,27 @@
         .container {
             color: #f8f8f8;
         }
-
-        .left-fact-form {
-            padding-bottom: 25px;
-        }
-
-        .right-fact-form {
-            padding-bottom: 20px;
-        }
     </style>
 {% endblock %}
 
 {% block main %}
-    <div class="content-w3ls">
         <div class="container">
-            <h3 class="text-primary">Delete Rule</h3>
-            <form class="form-horizontal" method="post" action="{% url 'add_rule' %}">
+            <h3 class="alert alert-info">Delete Rule</h3>
+            <form class="form-horizontal" method="post" action="{% url 'delete_rule' %}">
                 <h4 class="text-danger">Do you really want to delete this rule ?</h4>
+                <p style="color: #f8f8f8">{{ rule_mean }}</p>
                 {% csrf_token %}
+                <input type="hidden" class="form-control" name="rule_id" id="rule_id"
+                       value="{{ rule_id }}" readonly>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-danger" id="btn-modal-save-change">Delete
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
             </form>
         </div>
-    </div>
 {% endblock %}
 {% block javascript %}
     <script>
