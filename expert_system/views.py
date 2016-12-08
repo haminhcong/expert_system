@@ -5,6 +5,7 @@ from expert_system.user import classify, algorithm
 from models import StoreItem, ItemProperty, Fact, RightFactModel, LeftFactModel, RuleModel
 from django.shortcuts import redirect
 
+
 def index(request):
     item_list = StoreItem.objects.all()
     for item in item_list:
@@ -51,7 +52,7 @@ def query_expert(request):
 
 
 class RuleData:
-    def __init__(self,rule_id, left_side, right_side, cf):
+    def __init__(self, rule_id, left_side, right_side, cf):
         self.rule_id = rule_id
         self.left_side = left_side
         self.right_side = right_side
@@ -63,16 +64,16 @@ def get_rule_list(request):
         rule_list = RuleModel.objects.all()
         rule_data = []
         for rule in rule_list:
-            left_side=''
+            left_side = ''
             left_fact_list = rule.leftfactmodel_set.all()
-            if len(left_fact_list)>0:
+            if len(left_fact_list) > 0:
                 left_side = left_fact_list[0].content + '(' + left_fact_list[0].type + ')'
-                for i in range(1,len(left_fact_list)):
+                for i in range(1, len(left_fact_list)):
                     left_side = left_side + ' and ' + left_fact_list[i].content + '(' + left_fact_list[i].type + ')'
-            right_side = rule.right.content + '('+str(rule.right.type)+')'
+            right_side = rule.right.content + '(' + str(rule.right.type) + ')'
             cf = rule.cf
-            rule_id= rule.id
-            rule_data.append(RuleData(rule_id,left_side, right_side, cf))
+            rule_id = rule.id
+            rule_data.append(RuleData(rule_id, left_side, right_side, cf))
         context = {
             'rule_list': rule_data
         }
@@ -84,26 +85,67 @@ def add_rule(request):
         return render(request, 'expert_system/add_rule.html', {})
 
     if request.method == "POST":
-        left_fact_1 = request.POST['left-fact-1']
-        left_fact_1_type = request.POST['left-fact-1-type']
-        left_fact_2 = request.POST['left-fact-2']
-        left_fact_2_type = request.POST['left-fact-2-type']
-
-        left_fact_list = [
-            LeftFactModel(content=left_fact_1, type=left_fact_1_type),
-            LeftFactModel(content=left_fact_2, type=left_fact_2_type),
-        ]
+        left_fact_list = []
+        for x in range(1, 5):
+            left_fact = request.POST['left-fact-' + str(x)]
+            left_fact_type = request.POST['left-fact-' + str(x) + '-type']
+            if len(left_fact) > 0:
+                left_fact_list.append(LeftFactModel(content=left_fact, type=left_fact_type))
         right_fact_content = request.POST['right-fact']
         right_fact_type = request.POST['right-fact-type']
 
         right_fact = RightFactModel(content=right_fact_content, type=right_fact_type)
         right_fact.save()
-
         rule_cf = request.POST['rule-cf']
-        new_rule = RuleModel(cf=rule_cf,right=right_fact)
+        new_rule = RuleModel(cf=rule_cf, right=right_fact)
         new_rule.save()
 
         for left_fact in left_fact_list:
-            left_fact.rule_model=new_rule
+            left_fact.rule_model = new_rule
             left_fact.save()
         return redirect(to='rule_list')
+
+
+class ValueList:
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value
+
+
+def edit_rule(request, rule_id):
+    if request.method == "GET":
+        rule = RuleModel.objects.filter(id=rule_id).first()
+        left_fact_list = rule.leftfactmodel_set.all()
+        right_fact = rule.right
+        cf = rule.cf
+        context = {}
+        for x in range(0, len(left_fact_list)):
+            context['left_fact_' + str(x + 1)] = left_fact_list[x].content
+            context['left_fact_' + str(x + 1) + '_type'] = int(left_fact_list[x].type)
+            # context['left_fact_' + str(x + 1) + '_type'] = 2
+
+        for x in range(len(left_fact_list), 5):
+            context['left_fact_' + str(x + 1)] = ''
+            context['left_fact_' + str(x + 1) + '_type'] = 1
+        right_fact.type = int(right_fact.type)
+        context['right_fact'] = right_fact
+        context['cf'] = cf
+        context['rule_id'] = rule.id
+        context['value_list'] = [ValueList(1,'Start fact'),ValueList(2,'Middle Fact'), ValueList(3,'End Fact')]
+        return render(request, 'expert_system/edit_rule.html', context)
+
+    if request.method == "POST":
+        return redirect(to='rule_list')
+
+
+def delete_rule(request, rule_id):
+    if request.method == "GET":
+        rule = RuleModel.objects.filter(id=rule_id).first()
+        left_fact_list = rule.leftfactmodel_set.all()
+        right_fact = rule.right
+        context = {}
+        return render(request, 'expert_system/delete_rule.html', context)
+
+    if request.method == "POST":
+        return redirect(to='rule_list')
+

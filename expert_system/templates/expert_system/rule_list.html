@@ -30,7 +30,7 @@
 {% block main %}
     <div class="content-w3ls">
         <div class="container">
-            <div class="col-md-10 col-md-offset-1">
+            <div class="col-md-offset-1 table-rule">
 
                 <div class="panel panel-default panel-table">
                     <div class="panel-heading">
@@ -53,6 +53,7 @@
                                 <th>Left Side</th>
                                 <th>Rigt Side</th>
                                 <th>CF</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,6 +63,17 @@
                                     <td>{{ rule.left_side }}</td>
                                     <td>{{ rule.right_side }}</td>
                                     <td>{{ rule.cf }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_rule' rule_id=rule.rule_id %}" class="btn btn-primary"
+                                           role="button">
+                                            EDIT
+                                        </a>
+                                        <a href="{% url 'delete_rule' rule_id=rule.rule_id %}" class="btn btn-danger"
+                                           role="button">
+                                            DELETE
+                                        </a>
+
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

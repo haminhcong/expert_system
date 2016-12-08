@@ -1,0 +1,40 @@
+{% extends "expert_system/base.html" %}
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">
+    <script src="{% static 'expert_system/js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'expert_system/js/d3.v3.min.js' %}"></script>
+    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'expert_system/css/expert_system.css' %}">
+    <style>
+        .container {
+            color: #f8f8f8;
+        }
+
+        .left-fact-form {
+            padding-bottom: 25px;
+        }
+
+        .right-fact-form {
+            padding-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="content-w3ls">
+        <div class="container">
+            <h3 class="text-primary">Delete Rule</h3>
+            <form class="form-horizontal" method="post" action="{% url 'add_rule' %}">
+                <h4 class="text-danger">Do you really want to delete this rule ?</h4>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    <script>
+
+    </script>
+
+{% endblock %}
