@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http.response import HttpResponse
 import json
 from expert_system.user import classify, algorithm
-from models import StoreItem, ItemProperty, Fact, RightFactModel, LeftFactModel, RuleModel
+from models import StoreItem, ItemProperty, Fact, RightFactModel, LeftFactModel, RuleModel, PropertyValue
 from django.shortcuts import redirect
 
 
@@ -47,6 +47,14 @@ def backward_charning(list_fact_input, list_rule):
 
 def query_expert(request):
     if request.method == "POST":
+        fact_init = []
+        fact_numbers = int(request.POST['property_numbers'])
+        for x in range(0, fact_numbers):
+            property_index_id = request.POST['property_' + str(x) + '_id']
+            property_index_value_id = request.POST['property_' + str(x) + '_value_id']
+            property_name = ItemProperty.objects.filter(id=property_index_id).first().property_name
+            property_value = PropertyValue.objects.filter(id=property_index_value_id).first().value
+            fact_init.append(property_name + ' = ' + property_value)
         pass
     return HttpResponse(json.dumps({}), content_type='application/json')
 
@@ -138,7 +146,7 @@ def edit_rule(request, rule_id):
         rule_id = request.POST['rule_id']
         current_rule = RuleModel.objects.filter(id=rule_id).first()
         old_left_fact_list = current_rule.leftfactmodel_set.all()
-        for old_fact  in old_left_fact_list:
+        for old_fact in old_left_fact_list:
             old_fact.delete()
         new_left_fact_list = []
         for x in range(1, 5):
@@ -148,10 +156,10 @@ def edit_rule(request, rule_id):
                 new_left_fact_list.append(LeftFactModel(content=left_fact, type=left_fact_type))
         new_right_fact_content = request.POST['right-fact']
         right_fact_type = request.POST['right-fact-type']
-        current_right_fact =  current_rule.right
+        current_right_fact = current_rule.right
         rule_cf = request.POST['rule-cf']
         current_right_fact.content = new_right_fact_content
-        current_right_fact.type =right_fact_type
+        current_right_fact.type = right_fact_type
         current_rule.cf = rule_cf
         current_right_fact.save()
         current_rule.save()

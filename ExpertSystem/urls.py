@@ -17,5 +17,5 @@ from django.contrib import admin
 from expert_system import urls as expert_urls
 urlpatterns = [
     url(r'^', include('expert_system.urls'),name='expert_system'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls),name='admin'),
 ]

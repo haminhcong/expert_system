@@ -7,7 +7,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Feedback Form Flat Responsive widget Template :: w3layouts</title>
+    <title>Expert Systemm - BKCloud</title>
     {% load static %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -47,7 +47,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 
 </div>
 
-<div id="wrapper">
+<div id="wrapper" class="toggled">
 
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
@@ -67,6 +67,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <a href="{% url 'add_rule' %}">Add New Rule</a>
             </li>
 
+            <li>
+                <a href="/admin/">Administrator</a>
+            </li>
         </ul>
     </div>
     <!-- /#sidebar-wrapper -->
@@ -85,7 +88,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 {##}
 {#    <!-- Menu Toggle Script -->#}
 <script>
-    $("#wrapper").toggleClass("toggled");
     $("#menu-toggle").click(function (e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
