@@ -1,7 +1,8 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http.response import HttpResponse
 import json
-from expert_system.user import classify, algorithm
+from expert_system import algorithm
 from models import StoreItem, ItemProperty, Fact, RightFactModel, LeftFactModel, RuleModel, PropertyValue
 from django.shortcuts import redirect
 
@@ -38,26 +39,141 @@ def get_property_value(request):
     return HttpResponse(json.dumps(property_data), content_type='application/json')
 
 
-def backward_charning(list_fact_input, list_rule):
-    list_fact = Fact.objects.all()
-    list_fact = classify.classify_fact(list_fact, list_rule)
-    results = algorithm.backward_chaining(list_fact, list_rule)
-    return results
 
 
 def query_expert(request):
+    result =  {
+        'value': '0',
+        'result':'result not found'
+    }
     if request.method == "POST":
-        fact_init = []
+        inputs = []
         fact_numbers = int(request.POST['property_numbers'])
         for x in range(0, fact_numbers):
             property_index_id = request.POST['property_' + str(x) + '_id']
             property_index_value_id = request.POST['property_' + str(x) + '_value_id']
             property_name = ItemProperty.objects.filter(id=property_index_id).first().property_name
             property_value = PropertyValue.objects.filter(id=property_index_value_id).first().value
-            fact_init.append(property_name + ' = ' + property_value)
-        pass
-    return HttpResponse(json.dumps({}), content_type='application/json')
+            inputs.append(property_name + ' = ' + property_value)
+        item_name = StoreItem.objects.filter(id=request.POST['item_id']).first().name
+        item_name_fact = u'Loại hàng = ' + item_name.lower()
+        inputs.append(item_name_fact)
+        facts = LeftFactModel.objects.all()
+        list_fact = []
+        for fact_input in inputs:
+            for fact in facts:
+                if fact.content.__contains__(fact_input):
+                    list_fact.append(fact)
+                    break
+        results = backward_charning(list_fact)
+        list_result = []
+        if results != 'result not found':
+            for result in results:
+                fact = {
+                    'content': result['fact']['content'],
+                    'CF': result['fact']['CF']
+                }
+                how_list = []
+                for how in result['how_list']:
+                    lefts = how['left']
+                    rule_left = ''
+                    for left in lefts:
+                        rule_left += left + ' AND '
+                    rule = {
+                        'rule': 'IF ' + rule_left[:-4] + ' THEN ' + how['right'],
+                        'CF': how['CF']
+                    }
+                    how_list.append(rule)
+                result_js = {
+                    'fact': fact,
+                    'how_list': how_list
+                }
+                list_result.append(result_js)
+            result = {
+                'value': '1',
+                'inputs': inputs,
+                'result': list_result,
+            }
+            return render(request, 'expert_system/result.html', result)
+        else:
+            result = {'value': '0',
+                      'inputs': inputs,
+                      'result': 'result not found'}
+            return render(request, 'expert_system/result.html', result)
+    return render(request, 'expert_system/result.html', result)
 
+def backward_charning(list_fact_input):
+    list_fact1 = []
+    for fact in RightFactModel.objects.all():
+        check = True
+        for fact1 in list_fact1:
+            if fact.content == fact1.content:
+                check = False
+                break
+        if check:
+            if fact.type == '3':
+                list_fact1.append(fact)
+
+    for fact in LeftFactModel.objects.all():
+        check = True
+        for fact1 in list_fact1:
+            if fact.content == fact1.content:
+                check = False
+                break
+        if check:
+            list_fact1.append(fact)
+    list_fact = []
+    count = 1
+    for fact in list_fact1:
+        check = False
+        for fact_input in list_fact_input:
+            if fact_input.content == fact.content:
+                check = True
+                break
+        if check:
+            is_value = '1'
+            value = '1'
+        elif fact.type == '1':
+            is_value = '1'
+            value = '0'
+        else:
+            is_value = '0'
+            value = '0'
+        list_fact.append({
+            'id': count,
+            'type': fact.type,
+            'content': fact.content,
+            'CF': 1,
+            'is_value': is_value,
+            'value': value,
+        })
+        count += 1
+    rules = RuleModel.objects.all()
+    list_rule = []
+    count = 0
+    for rule in rules:
+        left_fact = []
+        for fact_obj in rule.leftfactmodel_set.all():
+            for fact_json in list_fact:
+                if fact_obj.content == fact_json['content']:
+                    left_fact.append(fact_json['id'])
+                    break
+
+        for fact in list_fact:
+            x = rule.right.content
+            y = fact['content']
+            if x == y:
+                list_rule.append({
+                    'id': count,
+                    'left': left_fact,
+                    'right': fact['id'],
+                    'CF': rule.cf
+                })
+                count += 1
+                break
+    backward = algorithm.BackWard(list_fact, list_rule)
+    result = backward.backward_chaining()
+    return result
 
 class RuleData:
     def __init__(self, rule_id, left_side, right_side, cf):

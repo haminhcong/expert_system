@@ -1,0 +1,98 @@
+{% extends 'expert_system/base.html' %}
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'expert_system/css/bootstrap.css' %}">
+    <script src="{% static 'expert_system/js/bootstrap.js' %}"></script>
+    <style>
+        .container {
+            width: 90%;
+            background: white;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+
+        .content_expert {
+            width: 90%;
+        }
+
+        hr {
+            display: block;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            border-style: inset;
+            border-width: 1px;
+        }
+
+        .img_expert {
+            padding-top: 50px;
+            padding-bottom: 20px;
+            padding-left: 10px;
+        }
+
+        .result_expert {
+            padding-left: 10px;
+            padding-top: 10px;
+        }
+
+        .main_expert {
+            padding-bottom: 30px;
+        }
+
+        #button_expert {
+            padding-left: 200px;
+            padding-top: 20px;
+
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <div class="container">
+        <div class="content_expert">
+            <h1> Result</h1>
+        </div>
+        <hr>
+        <div class="row">
+            {% if value == '1' %}
+                <div class="col-md-3 img_expert">
+                    <img src="{% static 'expert_system/img/result_success.png' %}">
+                </div>
+            {% else %}
+                <div class="col-md-3 img_expert">
+                    <img src="{% static 'expert_system/img/result_fail.png' %}">
+                </div>
+            {% endif %}
+            <div class="col-md-9 main_expert">
+                <h2>
+                    Thông tin đầu vào:
+                </h2>
+                {% for input_unit in inputs %}
+                    <span class="result_expert">{{ input_unit }}</span>
+                    <br>
+                {% endfor %}
+                {% if value == '1' %}
+                    <h2>
+                        Kết quả đầu ra:
+                    </h2>
+                    {% for unit in result %}
+                        <h3>Kết luận: </h3>
+                        <span class="result_expert">{{ unit.fact.content }}  CF: {{ unit.fact.CF }}</span>
+                        <br>
+                        <h3>
+                            Các Luật suy diễn đến kết quả:
+                        </h3>
+                        {% for list in unit.how_list %}
+                            <span class="result_expert">{{ list.rule }}  CF: {{ list.CF }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <h3>Sorry! result not found</h3>
+                {% endif %}
+                <p id="button_expert"><a href="{% url 'index' %}" class="btn btn-primary" role="button">Quay lại trang tìm kiếm</a></p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

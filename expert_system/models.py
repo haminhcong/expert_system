@@ -21,7 +21,7 @@ class ItemProperty(models.Model):
         return u'%s' % self.property_name
 
     def __str__(self):  # __unicode__ on Python 2
-        return "%s" % self.property_name
+        return self.property_name + ' - ' + self.item.name
 
 
 class PropertyValue(models.Model):
